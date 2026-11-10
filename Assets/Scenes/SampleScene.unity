@@ -1605,7 +1605,7 @@ GameObject:
   - component: {fileID: 1510507083}
   - component: {fileID: 1510507081}
   m_Layer: 0
-  m_Name: CinemachineCamera
+  m_Name: Square
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
