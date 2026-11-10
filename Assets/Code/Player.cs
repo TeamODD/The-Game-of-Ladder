@@ -12,6 +12,7 @@ public class Player : MonoBehaviour
     private Rigidbody2D rb;
     private int moveInput;
     private SpriteRenderer sprite;
+
     private Animator animator;
 
 
@@ -21,6 +22,8 @@ public class Player : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         sprite = GetComponent<SpriteRenderer>();
         animator = GetComponent<Animator>();
+
+        rb.freezeRotation = true;
     }
 
     private void Start()
