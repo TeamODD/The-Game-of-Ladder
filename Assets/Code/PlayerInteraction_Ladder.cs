@@ -113,11 +113,17 @@ public class PlayerInteraction : MonoBehaviour
         if (ladderRb != null)
             ladderRb.simulated = false;
 
-        Collider2D ladderCollider =
-            carriedLadder.GetComponent<Collider2D>();
+        Collider2D[] colliders =
+            carriedLadder.GetComponentsInChildren<Collider2D>();
 
-        if (ladderCollider != null)
-            ladderCollider.enabled = false;
+        foreach (Collider2D col in colliders)
+        {
+            col.enabled = false;
+            if (col.gameObject.CompareTag("LadderPath"))
+            {
+                col.isTrigger = true;
+            }
+        }
     }
 
     void ChangeMode()
@@ -139,11 +145,6 @@ public class PlayerInteraction : MonoBehaviour
 
         // 조절 모드에서는 플레이어 이동 제한
         Player.canMove = (currentMode == LadderMode.Normal);
-    }
-
-    void FixPlayer()
-    {
-        Player.canMove = !Player.canMove;
     }
 
     void AngleMode()
@@ -196,33 +197,22 @@ public class PlayerInteraction : MonoBehaviour
         if (carriedLadder == null)
             return;
 
-        // 사다리 아래쪽 끝에서 아래 방향으로 Ray 발사
-        Vector3 bottomPosition = carriedLadder.transform.position;
-
-        RaycastHit2D hit = Physics2D.Raycast(
-            bottomPosition,
-            Vector2.down,
-            placeRayDistance,
-            groundLayer
-        );
-
-        // 바닥을 찾지 못했다면 설치하지 않음
-        if (hit.collider == null)
-            return;
 
         // 부모 관계 해제
         carriedLadder.transform.SetParent(null, true);
 
-        // 바닥 표면에 사다리 아래쪽 끝 맞추기
-        bottomPosition.y = hit.point.y;
-        carriedLadder.transform.position = bottomPosition;
-
         // 충돌 활성화
-        Collider2D ladderCollider =
-            carriedLadder.GetComponent<Collider2D>();
+        Collider2D[] colliders =
+            carriedLadder.GetComponentsInChildren<Collider2D>();
 
-        if (ladderCollider != null)
-            ladderCollider.enabled = true;
+        foreach (Collider2D col in colliders)
+        {
+            col.enabled = true;
+            if (col.gameObject.CompareTag("LadderPath"))
+            {
+                col.isTrigger = true;
+            }
+        }
 
         // 설치 후 물리적으로 움직이지 않도록 고정
         Rigidbody2D ladderRb =

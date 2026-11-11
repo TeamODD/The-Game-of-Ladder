@@ -6,6 +6,8 @@ TagManager:
   tags:
   - Ladder
   - Ground
+  - LadderPath
+  - LadderStart
   layers:
   - Default
   - TransparentFX
