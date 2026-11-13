@@ -5,11 +5,7 @@ using System.Diagnostics.Tracing;
 using UnityEngine;
 
 // 계산 결과를 담는 구조체
-public struct SlipResult
-{
-    public bool isStable;  // 사다리가 안정적으로 설치되어있는지
-    public float slipPoint;  // 미끄러지기 시작하는 지점 (0~1, 사다리 길이 비율)
-}
+
 
 public static class LadderSlipCalculator
 {

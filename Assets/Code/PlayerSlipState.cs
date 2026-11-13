@@ -26,7 +26,7 @@ public class PlayerSlipState : MonoBehaviour
     public float minSlipTime = 0.2f;  // 시작 직후 바로 착지 처리되는 것 방지
 
     [Header("테스트 (에디터 전용)")]
-    public bool enableTestKey = true;          // 켜면 T키로 미끄러짐 테스트
+    public bool enableTestKey = false;          // 켜면 T키로 미끄러짐 테스트
     public Vector2 testSlipDirection = new Vector2(1f, -0.3f);
 
     public bool IsSlipping = false;
@@ -51,7 +51,9 @@ public class PlayerSlipState : MonoBehaviour
     // 현재 진행 비율(0~1)이 미끄러짐 지점을 넘었는지 (등반 코드에서 사용)
     public static bool ShouldSlip(float climbProgress, SlipResult result)
     {
+
         return !result.isStable && climbProgress >= result.slipPoint;
+
     }
 
     // 미끄러짐 시작 (direction: 미끄러지는 방향)
@@ -82,10 +84,12 @@ public class PlayerSlipState : MonoBehaviour
         if (Keyboard.current == null)
             return;
 
-//#if UNITY_EDITOR
+/*
+//#if UNITY_EDITOR 
         if (enableTestKey && !IsSlipping && Keyboard.current.tKey.wasPressedThisFrame)
             StartSlip(testSlipDirection);
-//#endif
+//#endif 
+*/
 
         if (!IsSlipping)
             return;
