@@ -45,7 +45,7 @@ public class PlayerInteraction : MonoBehaviour
     }
     void Update()
     {
-        // WÅ°¸¦ ´­·¶À» ¶§
+        // Wí‚¤ë¥¼ ëˆŒë €ì„ ë•Œ
         if (Keyboard.current == null)
             return;
 
@@ -119,6 +119,10 @@ public class PlayerInteraction : MonoBehaviour
         carriedLadder = targetLadder;
         targetLadder = null;
 
+        LadderSlipData slipData = carriedLadder.GetComponent<LadderSlipData>();
+        if (slipData != null)
+            slipData.ClearResult();
+
         SpriteRenderer sr = carriedLadder.GetComponent<SpriteRenderer>();
 
         carriedLadder.transform.SetParent(carryPoint);
@@ -165,13 +169,13 @@ public class PlayerInteraction : MonoBehaviour
                 break;
         }
 
-        // Á¶Àı ¸ğµå¿¡¼­´Â ÇÃ·¹ÀÌ¾î ÀÌµ¿ Á¦ÇÑ
+        // ì¡°ì ˆ ëª¨ë“œì—ì„œëŠ” í”Œë ˆì´ì–´ ì´ë™ ì œí•œ
         Player.canMove = (currentMode == LadderMode.Normal);
     }
 
     void AngleMode()
     {
-        // °¢µµ Á¶Àı ¸ğµå
+        // ê°ë„ ì¡°ì ˆ ëª¨ë“œ
         float rotationInput = 0f;
 
         if (Keyboard.current.aKey.isPressed)
@@ -227,16 +231,18 @@ public class PlayerInteraction : MonoBehaviour
 
     void PlaceLadder()
     {
+        LadderSlipData slipData = carriedLadder.GetComponent<LadderSlipData>();
+        if (slipData != null)
+            slipData.EvaluatePlacement();
+
         if (carriedLadder == null)
             return;
 
-
-        // ºÎ¸ğ °ü°è ÇØÁ¦
+        // ë¶€ëª¨ ê´€ê³„ í•´ì œ
         carriedLadder.transform.SetParent(null, true);
 
-        // Ãæµ¹ È°¼ºÈ­
-        Collider2D[] colliders =
-            carriedLadder.GetComponentsInChildren<Collider2D>();
+        // ì¶©ëŒ í™œì„±í™”
+        Collider2D[] colliders = carriedLadder.GetComponentsInChildren<Collider2D>();
 
         foreach (Collider2D col in colliders)
         {
@@ -247,9 +253,8 @@ public class PlayerInteraction : MonoBehaviour
             }
         }
 
-        // ¼³Ä¡ ÈÄ ¹°¸®ÀûÀ¸·Î ¿òÁ÷ÀÌÁö ¾Êµµ·Ï °íÁ¤
-        Rigidbody2D ladderRb =
-            carriedLadder.GetComponent<Rigidbody2D>();
+        // ì„¤ì¹˜ í›„ ë¬¼ë¦¬ì ìœ¼ë¡œ ì›€ì§ì´ì§€ ì•Šë„ë¡ ê³ ì •
+        Rigidbody2D ladderRb = carriedLadder.GetComponent<Rigidbody2D>();
 
         if (ladderRb != null)
         {
