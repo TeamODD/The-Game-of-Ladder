@@ -21,12 +21,20 @@ public class Player : MonoBehaviour
     private Transform LadderPath;
     private Transform currentLadderPath;
 
+    private PlayerSlipState slipState;
+
+    private Transform currentLadderStart;
+    private Transform currentLadderEnd;
+    private LadderSlipData currentLadderSlipData;
+
 
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
         sprite = GetComponent<SpriteRenderer>();
         animator = GetComponent<Animator>();
+        slipState = GetComponent<PlayerSlipState>();
+
         originalGravityScale = rb.gravityScale;
 
         rb.freezeRotation = true;
@@ -58,6 +66,9 @@ public class Player : MonoBehaviour
     {
         if (isClimbing && currentLadderPath != null)
         {
+            if (CheckLadderSlip())
+                return;
+
             Vector2 pathDirection = currentLadderPath.up.normalized;
 
             bool slopesRight = pathDirection.x >= 0;
@@ -68,6 +79,7 @@ public class Player : MonoBehaviour
 
             rb.linearVelocity =
                 pathDirection * climbInput * moveSpeed;
+            
         }
         else
         {
@@ -97,6 +109,10 @@ public class Player : MonoBehaviour
             }
 
             currentLadderPath = other.transform.parent.Find("LadderPath");
+            currentLadderStart = other.transform;
+            currentLadderEnd = other.transform.parent.Find("LadderEnd");
+            currentLadderSlipData =
+                other.transform.parent.GetComponent<LadderSlipData>();
 
             if (currentLadderPath == null)
                 return;
@@ -134,6 +150,9 @@ public class Player : MonoBehaviour
 
             isClimbing = false;
             currentLadderPath = null;
+            currentLadderStart = null;
+            currentLadderEnd = null;
+            currentLadderSlipData = null;
 
             rb.gravityScale = originalGravityScale;
             rb.linearVelocity = Vector2.zero;
@@ -146,9 +165,64 @@ public class Player : MonoBehaviour
 
         isClimbing = false;
         currentLadderPath = null;
+        currentLadderStart = null;
+        currentLadderEnd = null;
+        currentLadderSlipData = null;
         canMove = true;
 
         rb.gravityScale = originalGravityScale;
+    }
+
+    private bool CheckLadderSlip()
+    {
+        // 필요한 정보가 없으면 판정하지 않음
+        if (slipState == null ||
+            currentLadderSlipData == null ||
+            !currentLadderSlipData.HasResult ||
+            currentLadderStart == null ||
+            currentLadderEnd == null)
+        {
+            return false;
+        }
+
+        SlipResult result = currentLadderSlipData.Result;
+
+        // 안정적인 사다리라면 미끄러지지 않음
+        if (result.isStable)
+            return false;
+
+        // 사다리의 시작점과 끝점
+        Vector2 start = currentLadderStart.position;
+        Vector2 end = currentLadderEnd.position;
+
+        Vector2 ladderDirection = end - start;
+
+        // 사다리 길이가 0이면 판정하지 않음
+        if (ladderDirection.sqrMagnitude < 0.0001f)
+            return false;
+
+        // 플레이어의 현재 등반 진행도 계산 (0~1)
+        float climbProgress = Vector2.Dot(
+            (Vector2)transform.position - start,
+            ladderDirection
+        ) / ladderDirection.sqrMagnitude;
+
+        climbProgress = Mathf.Clamp01(climbProgress);
+
+        // 미끄러질 위치에 도달했는지 확인
+        if (PlayerSlipState.ShouldSlip(climbProgress, result))
+        {
+            Vector2 pathDirection = ladderDirection.normalized;
+
+            // 사다리 방향을 고려해 아래쪽으로 미끄러짐
+            Vector2 slipDirection = new Vector2(1f, -0.3f);
+
+            slipState.StartSlip(slipDirection);
+
+            return true;
+        }
+
+        return false;
     }
 
 }

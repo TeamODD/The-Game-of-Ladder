@@ -17,7 +17,6 @@ public class PlayerInteraction : MonoBehaviour
     public float rotateSpeed = 100f;
     public float minRotation = -90f;
     public float maxRotation = 90f;
-    private float currentRotation = 0f;
     
 
     private Vector3 ladderBaseScale;
@@ -45,7 +44,7 @@ public class PlayerInteraction : MonoBehaviour
     }
     void Update()
     {
-        // W키를 눌렀을 때
+        // W?��? ?��?????
         if (Keyboard.current == null)
             return;
 
@@ -169,7 +168,7 @@ public class PlayerInteraction : MonoBehaviour
                 break;
         }
 
-        // 조절 모드에서는 플레이어 이동 제한
+        // 조절 모드?�서???�레?�어 ?�동 ?�한
         Player.canMove = (currentMode == LadderMode.Normal);
     }
 
@@ -238,10 +237,10 @@ public class PlayerInteraction : MonoBehaviour
         if (carriedLadder == null)
             return;
 
-        // 부모 관계 해제
+        // 부�?관�??�제
         carriedLadder.transform.SetParent(null, true);
 
-        // 충돌 활성화
+        // 충돌 ?�성??
         Collider2D[] colliders = carriedLadder.GetComponentsInChildren<Collider2D>();
 
         foreach (Collider2D col in colliders)
@@ -253,7 +252,7 @@ public class PlayerInteraction : MonoBehaviour
             }
         }
 
-        // 설치 후 물리적으로 움직이지 않도록 고정
+        // ?�치 ??물리?�으�??�직이지 ?�도�?고정
         Rigidbody2D ladderRb = carriedLadder.GetComponent<Rigidbody2D>();
 
         if (ladderRb != null)

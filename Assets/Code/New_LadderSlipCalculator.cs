@@ -4,7 +4,11 @@ using UnityEngine;
 
 // 계산 결과를 담는 구조체 SlipResult는 기존 cs파일에 있는거 사용중
 // 나중에 여기로 옮기기거나 기존 파일과 New를 동시에 사용
-
+public struct SlipResult
+{
+    public bool isStable;  // 사다리가 안정적으로 설치되어있는지
+    public float slipPoint;  // 미끄러지기 시작하는 지점 (0~1, 사다리 길이 비율)
+}
 
 // 판정 수치 (수정 필요)
 [System.Serializable]
