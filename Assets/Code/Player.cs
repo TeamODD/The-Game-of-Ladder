@@ -1,3 +1,4 @@
+using System.IO;
 using Unity.VisualScripting.InputSystem;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -7,13 +8,13 @@ public class Player : MonoBehaviour
 {
     public float moveSpeed;
     public bool canMove = true;
-
+    public bool isClimbing = false;
 
     private Rigidbody2D rb;
     private int moveInput;
     private SpriteRenderer sprite;
     private float originalGravityScale;
-    private bool isClimbing = false;
+
 
     private Animator animator;
 
@@ -82,37 +83,61 @@ public class Player : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D other)
     {
-        if (!other.CompareTag("LadderStart"))
-            return;
-
-        if (!isClimbing)
+        // LadderStart에 진입하면 사다리 탑승
+        if (other.CompareTag("LadderStart"))
         {
-            // 사다리 탑승
+            if (isClimbing || moveInput == 0)
+            {
+                isClimbing = false;
+                currentLadderPath = null;
+
+                rb.gravityScale = originalGravityScale;
+                rb.linearVelocity = Vector2.zero;
+                return;
+            }
+
+            currentLadderPath = other.transform.parent.Find("LadderPath");
+
+            if (currentLadderPath == null)
+                return;
+
+            Vector2 pathDirection = currentLadderPath.up.normalized;
+
+            // 사다리가 오른쪽 위로 기울어졌는지 확인
+            bool slopesRight = pathDirection.x >= 0;
+
+            // 플레이어가 사다리 시작점의 어느 쪽에 있는지 확인
+            float playerSide = transform.position.x - other.transform.position.x;
+
+            // 오른쪽 위 사다리: 왼쪽에서 진입
+            // 왼쪽 위 사다리: 오른쪽에서 진입
+            bool canEnter =
+                (slopesRight && playerSide < 0) ||
+                (!slopesRight && playerSide > 0);
+
+            if (!canEnter)
+                return;
+
             isClimbing = true;
 
             rb.gravityScale = 0f;
             rb.linearVelocity = Vector2.zero;
 
-            // LadderStart에 연결된 LadderPath 찾기
-            currentLadderPath = other.transform.parent
-                .Find("LadderPath");
-
-            if (currentLadderPath != null)
-            {
-                transform.position = other.transform.position;
-            }
+            transform.position = other.transform.position;
         }
-        else
-        {
-            // 사다리에서 내리기
-            isClimbing = false;
 
+        // LadderEnd에 진입하면 사다리 하차
+        else if (other.CompareTag("LadderEnd"))
+        {
+            if (!isClimbing)
+                return;
+
+            isClimbing = false;
             currentLadderPath = null;
 
             rb.gravityScale = originalGravityScale;
             rb.linearVelocity = Vector2.zero;
         }
     }
-
 
 }
