@@ -4,12 +4,14 @@
 
 /*
 <내가 보려고 쓰는 보충 설명>
-(CinemachineCamera의 Inspector에 있음)
+메인게임 씬에 Cinemachine - Targeted Camera - Follow Camera 추가
 
 Position Composer
+- Follow -> Position Composer로 변경
+- Camera Distance: 10으로 설정
 - Damping: 부드럽게 따라가는 정도(수치가 클 수록 카메라 이동이 느려짐)
 - Dead Zone: 플레이어가 특정 영역 안에서 움직이면 카메라가 멈춰있음
-- Lookhead: 이동 방향 앞쪽을 미리 보여줌
+- Lookhead: 이동 방향 앞쪽을 미리 보여줌    
 
 Cinemachine Confiner 2D
 - 맵 밖에 화면에 보이지 않게 함
