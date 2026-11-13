@@ -93,7 +93,7 @@ public class PlayerInteraction : MonoBehaviour
 
     void PickUpLadder()
     {
-        if (nearbyLadder == null || carriedLadder != null)
+        if (nearbyLadder == null || carriedLadder != null || Player.isClimbing)
             return;
 
         carriedLadder = nearbyLadder;
@@ -128,6 +128,8 @@ public class PlayerInteraction : MonoBehaviour
 
     void ChangeMode()
     {
+        if (Player.isClimbing)
+            return;
         switch (currentMode)
         {
             case LadderMode.Normal:
