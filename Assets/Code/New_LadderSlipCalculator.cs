@@ -2,7 +2,8 @@
 // 충돌 방지 때문에 새로 만듦 (오브젝트에 붙이는 용도 아님)
 using UnityEngine;
 
-// 계산 결과를 담는 구조체
+// 계산 결과를 담는 구조체 SlipResult는 기존 cs파일에 있는거 사용중
+// 나중에 여기로 옮기기거나 기존 파일과 New를 동시에 사용
 public struct SlipResult
 {
     public bool isStable;  // 사다리가 안정적으로 설치되어있는지
