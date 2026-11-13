@@ -8,11 +8,16 @@ using UnityEngine.InputSystem;
 public class PlayerSlipState : MonoBehaviour
 {
     [Header("미끄러짐 시작")]
-    public float slipSpeed = 4f;  // 미끄러짐 시작 시 초기 속도
+    public float slipSpeed = 10f;  // 미끄러짐 시작 시 초기 속도
+
+    [Header("중력 설정")]
+    public float initialSlipGravity = 0.5f; // 튕김 직후 중력
+    public float gravityIncrease = 0.1f;
+    public float maxFallingGravity = 2.5f;       // 이후 강해지는 중력
 
     [Header("관성")]
-    public float horizontalDeceleration = 1.5f;  // 초당 수평 속도 감소량
-    public float counterControl = 2f;  // 반대 방향 입력 시 추가 감소량
+    public float horizontalDeceleration = 0.5f;  // 초당 수평 속도 감소량
+    public float counterControl = 1f;  // 반대 방향 입력 시 추가 감소량
 
     [Header("착지 판정")]
     public LayerMask groundLayer;
@@ -21,10 +26,10 @@ public class PlayerSlipState : MonoBehaviour
     public float minSlipTime = 0.2f;  // 시작 직후 바로 착지 처리되는 것 방지
 
     [Header("테스트 (에디터 전용)")]
-    public bool enableTestKey = false;          // 켜면 T키로 미끄러짐 테스트
+    public bool enableTestKey = true;          // 켜면 T키로 미끄러짐 테스트
     public Vector2 testSlipDirection = new Vector2(1f, -0.3f);
 
-    public bool IsSlipping { get; private set; }
+    public bool IsSlipping = false;
     public event Action OnSlipStarted;
     public event Action OnSlipEnded;
 
@@ -59,9 +64,14 @@ public class PlayerSlipState : MonoBehaviour
         slipTimer = 0f;
         horizontalInput = 0f;
 
+        if (player != null)
+        {
+            player.ForceExitClimbing();
+        }
+
         SetControlComponents(false);
 
-        rb.gravityScale = originalGravityScale; // 등반 중 0이었던 중력 복구
+        rb.gravityScale = initialSlipGravity ; // 등반 중 0이었던 중력 복구
         rb.linearVelocity = direction.normalized * slipSpeed;
 
         OnSlipStarted?.Invoke();
@@ -72,10 +82,10 @@ public class PlayerSlipState : MonoBehaviour
         if (Keyboard.current == null)
             return;
 
-#if UNITY_EDITOR
+//#if UNITY_EDITOR
         if (enableTestKey && !IsSlipping && Keyboard.current.tKey.wasPressedThisFrame)
             StartSlip(testSlipDirection);
-#endif
+//#endif
 
         if (!IsSlipping)
             return;
@@ -92,6 +102,11 @@ public class PlayerSlipState : MonoBehaviour
             return;
 
         slipTimer += Time.fixedDeltaTime;
+        if (rb.gravityScale < maxFallingGravity)
+        {
+            rb.gravityScale += gravityIncrease;
+        }
+
 
         Vector2 v = rb.linearVelocity;
 
@@ -107,7 +122,11 @@ public class PlayerSlipState : MonoBehaviour
 
         // 착지 판정 (하강 중일 때만)
         if (slipTimer >= minSlipTime && v.y <= 0f && IsGrounded())
+        {
             EndSlip();
+            return;
+        }
+
     }
 
     private bool IsGrounded()
@@ -118,12 +137,16 @@ public class PlayerSlipState : MonoBehaviour
 
     private void EndSlip()
     {
+        if (!IsSlipping)
+            return;
+
         IsSlipping = false;
         rb.linearVelocity = Vector2.zero;
 
         SetControlComponents(true);
 
         OnSlipEnded?.Invoke();
+
     }
 
     // 미끄러짐 중에는 기존 이동/상호작용 스크립트를 멈춰 속도 덮어쓰기와 W 입력을 차단
@@ -138,4 +161,5 @@ public class PlayerSlipState : MonoBehaviour
         Gizmos.color = Color.yellow;
         Gizmos.DrawWireCube((Vector2)transform.position + groundCheckOffset, groundCheckSize);
     }
+
 }

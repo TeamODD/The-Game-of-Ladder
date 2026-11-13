@@ -9,14 +9,23 @@ public class PlayerInteraction : MonoBehaviour
     private GameObject carriedLadder;
     private Player Player;
 
-    [Header("Ladder Length")]
+    [Header("사다리 조절")]
     public float lengthChangeSpeed = 1f;
     public float minLengthScale = 0.5f;
     public float maxLengthScale = 2.5f;
+    [Header("Ladder Rotation")]
+    public float rotateSpeed = 100f;
+    public float minRotation = -90f;
+    public float maxRotation = 90f;
+    private float currentRotation = 0f;
+    
 
     private Vector3 ladderBaseScale;
     private float currentLengthScale = 1f;
 
+    [Header("Ladder Supply")]
+    public GameObject ladderInSupply;
+    private bool isNearLadderSupply = false;
 
     public enum LadderMode
     {
@@ -28,11 +37,7 @@ public class PlayerInteraction : MonoBehaviour
 
     private LadderMode currentMode = LadderMode.Normal;
 
-    public LayerMask groundLayer;
-    public float placeRayDistance = 20f;
 
-
-    public float rotateSpeed = 100f;
 
     private void Awake()
     {
@@ -48,7 +53,14 @@ public class PlayerInteraction : MonoBehaviour
         {
             if (carriedLadder == null)
             {
-                PickUpLadder();
+                if (isNearLadderSupply && ladderInSupply != null)
+                {
+                    PickUpLadder(ladderInSupply);
+                }
+                else if (nearbyLadder != null)
+                {
+                    PickUpLadder(nearbyLadder);
+                }
             }
             else
             {
@@ -81,6 +93,10 @@ public class PlayerInteraction : MonoBehaviour
         {
             nearbyLadder = other.gameObject;
         }
+        if (other.CompareTag("LadderSupply"))
+        {
+            isNearLadderSupply = true;
+        }
     }
 
     void OnTriggerExit2D(Collider2D other)
@@ -89,15 +105,19 @@ public class PlayerInteraction : MonoBehaviour
         {
             nearbyLadder = null;
         }
+        if (other.CompareTag("LadderSupply"))
+        {
+            isNearLadderSupply = false;
+        }
     }
 
-    void PickUpLadder()
+    void PickUpLadder(GameObject targetLadder)
     {
-        if (nearbyLadder == null || carriedLadder != null || Player.isClimbing)
+        if (targetLadder == null || carriedLadder != null || Player.isClimbing)
             return;
 
-        carriedLadder = nearbyLadder;
-        nearbyLadder = null;
+        carriedLadder = targetLadder;
+        targetLadder = null;
 
         SpriteRenderer sr = carriedLadder.GetComponent<SpriteRenderer>();
 
@@ -160,11 +180,22 @@ public class PlayerInteraction : MonoBehaviour
         if (Keyboard.current.dKey.isPressed)
             rotationInput = -1f;
 
-        carryPoint.Rotate(
-            0f,
-            0f,
-            rotationInput * rotateSpeed * Time.deltaTime
-        );
+        // 현재 각도 가져오기
+        float currentAngle = carryPoint.localEulerAngles.z;
+
+        // 0~360도를 -180~180도로 변환
+        if (currentAngle > 180f)
+            currentAngle -= 360f;
+
+        // 회전 각도 계산
+        float nextAngle = currentAngle +
+            rotationInput * rotateSpeed * Time.deltaTime;
+
+        // -90도 ~ 90도로 제한
+        nextAngle = Mathf.Clamp(nextAngle, -90f, 90f);
+
+        // 회전 적용
+        carryPoint.localRotation = Quaternion.Euler(0f, 0f, nextAngle);
 
     }
 

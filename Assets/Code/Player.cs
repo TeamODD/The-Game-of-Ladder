@@ -139,5 +139,16 @@ public class Player : MonoBehaviour
             rb.linearVelocity = Vector2.zero;
         }
     }
+    public void ForceExitClimbing()
+    {
+        if (!isClimbing)
+            return;
+
+        isClimbing = false;
+        currentLadderPath = null;
+        canMove = true;
+
+        rb.gravityScale = originalGravityScale;
+    }
 
 }
