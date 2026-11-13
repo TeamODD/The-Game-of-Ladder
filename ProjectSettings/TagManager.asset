@@ -9,6 +9,7 @@ TagManager:
   - LadderPath
   - LadderStart
   - LadderEnd
+  - LadderSupply
   layers:
   - Default
   - TransparentFX
