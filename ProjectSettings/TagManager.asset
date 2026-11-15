@@ -10,6 +10,7 @@ TagManager:
   - LadderStart
   - LadderEnd
   - LadderSupply
+  - LadderCheck
   layers:
   - Default
   - TransparentFX
@@ -44,8 +45,14 @@ TagManager:
   - 
   - 
   m_SortingLayers:
-  - name: Under
+  - name: Boundary
+    uniqueID: 3338817371
+    locked: 0
+  - name: BackGround
     uniqueID: 3269557729
+    locked: 0
+  - name: MapObject
+    uniqueID: 2629430485
     locked: 0
   - name: Default
     uniqueID: 0

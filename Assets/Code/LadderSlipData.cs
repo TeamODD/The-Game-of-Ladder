@@ -6,9 +6,10 @@ using UnityEngine;
 
 public class LadderSlipData : MonoBehaviour
 {
-[Header("판정 수치")]
+    [Header("판정 수치")]
     public SlipSettings settings = SlipSettings.Default;
     public float zoneSearchRadius = 1.5f;  // 끝점에서 이 거리 안의 판정 사각형만 찾음
+
 
     [Header("디버그")]
     public bool logResult = true;
@@ -18,21 +19,24 @@ public class LadderSlipData : MonoBehaviour
     public LadderAnchorZone TargetZone { get; private set; }
 
     private Transform ladderStart;
+    private Transform ladderCheck;
     private Transform ladderEnd;
+    private float ladderEndExtraHeight = 0.3f;
 
     private void Awake()
     {
         ladderStart = FindChildWithTag("LadderStart");
+        ladderCheck = FindChildWithTag("LadderCheck");
         ladderEnd = FindChildWithTag("LadderEnd");
 
-        if (ladderStart == null || ladderEnd == null)
-            Debug.LogWarning($"[LadderSlipData] {name}: LadderStart/LadderEnd 자식을 찾지 못함");
+        if (ladderStart == null || ladderCheck == null || ladderEnd == null)
+            Debug.LogWarning($"[LadderSlipData] {name}: LadderStart/LadderCheck/LadderEnd 자식을 찾지 못함");
     }
 
     // 설치 직후 호출 (PlaceLadder에서)
     public SlipResult EvaluatePlacement()
     {
-        if (ladderStart == null || ladderEnd == null)
+        if (ladderStart == null || ladderCheck == null)
         {
             Result = New_LadderSlipCalculator.Unstable(0f);
             HasResult = true;
@@ -41,7 +45,7 @@ public class LadderSlipData : MonoBehaviour
 
         // 사다리 양 끝 → 계산기 입력값 (각도, 월드 길이)
         Vector2 start = ladderStart.position;
-        Vector2 dir = (Vector2)ladderEnd.position - start;
+        Vector2 dir = (Vector2)ladderCheck.position - start;
         float length = dir.magnitude;
         float angleDeg = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
 
@@ -55,6 +59,11 @@ public class LadderSlipData : MonoBehaviour
                                                    TargetZone.GetWorldRect(), settings);
 
         HasResult = true;
+
+        if (Result.isStable)
+        {
+            PositionLadderEnd();
+        }
 
         if (logResult)
             Debug.Log($"[LadderSlipData] 안정: {Result.isStable}, 미끄러짐 지점: {Result.slipPoint:F2}");
@@ -82,11 +91,11 @@ public class LadderSlipData : MonoBehaviour
     // 판정 결과 표시: 초록 = 안정, 빨강 = 불안정 (빨간 점 = 미끄러지는 지점)
     private void OnDrawGizmos()
     {
-        if (!HasResult || ladderStart == null || ladderEnd == null)
+        if (!HasResult || ladderStart == null || ladderCheck == null)
             return;
 
         Vector3 a = ladderStart.position;
-        Vector3 b = ladderEnd.position;
+        Vector3 b = ladderCheck.position;
 
         Gizmos.color = Result.isStable ? Color.green : Color.red;
         Gizmos.DrawLine(a, b);
@@ -94,4 +103,53 @@ public class LadderSlipData : MonoBehaviour
         if (!Result.isStable)
             Gizmos.DrawSphere(Vector3.Lerp(a, b, Result.slipPoint), 0.08f);
     }
+
+    private void PositionLadderEnd()
+    {
+        if (ladderEnd == null || ladderCheck == null)
+            return;
+
+        // 플레이어 찾기
+        Player player = FindAnyObjectByType<Player>();
+
+        if (player == null)
+        {
+            Debug.LogWarning("Player를 찾을 수 없습니다.");
+            return;
+        }
+
+        // 플레이어의 Collider 가져오기
+        CapsuleCollider2D playerCollider =
+            player.GetComponent<CapsuleCollider2D>();
+
+        if (playerCollider == null)
+        {
+            Debug.LogWarning("Player의 CapsuleCollider2D를 찾지 못했습니다.");
+            return;
+        }
+
+        Debug.Log(
+    $"Collider: {playerCollider.name}, " +
+    $"Enabled: {playerCollider.enabled}, " +
+    $"Height: {playerCollider.bounds.size.y}"
+);
+
+        // 사다리의 기울기 확인
+        Vector2 direction =
+            (Vector2)ladderCheck.position - (Vector2)ladderStart.position;
+
+        // 플레이어 Collider의 전체 높이
+        float playerHeight = playerCollider.bounds.size.y;
+
+        // LadderCheck에서 플레이어 전체 높이 + 여유 높이만큼 위로 이동
+        ladderEnd.position = ladderCheck.position +
+            Vector3.up * (playerHeight + ladderEndExtraHeight);
+        ladderEnd.rotation = Quaternion.identity;
+
+        Debug.Log(
+    $"Check Y: {ladderCheck.position.y}, " +
+    $"End Y: {ladderEnd.position.y}, " +
+    $"Player Height: {playerHeight}, ");
+    }
 }
+

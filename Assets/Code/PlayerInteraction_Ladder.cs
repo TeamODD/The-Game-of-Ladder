@@ -86,7 +86,8 @@ public class PlayerInteraction : MonoBehaviour
 
     }
 
-    void OnTriggerEnter2D(Collider2D other)
+
+    void OnTriggerStay2D(Collider2D other)
     {
         if (other.CompareTag("Ladder"))
         {
@@ -206,11 +207,14 @@ public class PlayerInteraction : MonoBehaviour
     {
         float input = 0f;
 
+        // 사다리가 왼쪽을 향하고 있는지 확인
+        bool isFacingLeft = carryPoint.lossyScale.x < 0f;
+
         if (Keyboard.current.dKey.isPressed)
-            input = 1f;
+            input = isFacingLeft ? -1f : 1f;
 
         if (Keyboard.current.aKey.isPressed)
-            input = -1f;
+            input = isFacingLeft ? 1f : -1f;
 
         currentLengthScale +=
             input * lengthChangeSpeed * Time.deltaTime;
