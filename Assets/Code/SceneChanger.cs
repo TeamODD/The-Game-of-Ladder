@@ -1,26 +1,36 @@
 // SceneChanger.cs
-// scene 바꾸기
+// scene 바꾸기 (ScreenFader로 페이드 아웃 -> 페이드 인 하며 전환)
 
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 public class SceneChanger : MonoBehaviour
 {
-    // (게임 시작)메인 게임 씬으로 넘어감
+    // 메인 게임 씬으로 넘어감
     public void StartGame()
     {
-        SceneManager.LoadScene("Scene_ywrain");
+        // 검은 화면 없이 타이틀이 사라지며 게임 씬이 드러남
+        ScreenFader.Instance.CrossFadeToScene("Scene_ywrain");
     }
 
     // 타이틀 씬으로 넘어감
     public void GoTitle()
     {
-        SceneManager.LoadScene("Title");
+        ScreenFader.Instance.FadeToScene("Title");
     }
 
-    // (게임 끝)종료 씬으로 넘어감
-    public void EndGame()
+    // 종료 씬으로 넘어감
+    public void GoEnd()
     {
-        SceneManager.LoadScene("End");
+        ScreenFader.Instance.FadeToScene("End");
+    }
+
+    // 프로그램 종료
+    public void QuitGame()
+    {
+        #if UNITY_EDITOR
+            UnityEditor.EditorApplication.isPlaying = false;
+        #else
+            Application.Quit();
+        #endif
     }
 }
