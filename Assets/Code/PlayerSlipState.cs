@@ -10,6 +10,16 @@ public class PlayerSlipState : MonoBehaviour
     [Header("미끄러짐 시작")]
     public float slipSpeed = 10f;  // 미끄러짐 시작 시 초기 속도
 
+    [Header("상태별 미끄러짐 속도")]
+    public float lowerSlipSpeed = 6f;
+    public float middleSlipSpeed = 10f;
+    public float upperSlipSpeed = 14f;
+
+    [Header("상태별 초기 중력")]
+    public float lowerSlipGravity = 0.5f;
+    public float middleSlipGravity = 0.7f;
+    public float upperSlipGravity = 1f;
+
     [Header("중력 설정")]
     public float initialSlipGravity = 0.5f; // 튕김 직후 중력
     public float gravityIncrease = 0.1f;
@@ -39,12 +49,16 @@ public class PlayerSlipState : MonoBehaviour
     private float originalGravityScale;
     private float slipTimer;
     private float horizontalInput;
+    private SpriteRenderer playerSpriteRenderer;
+    private Animator animator;
 
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
         player = GetComponent<Player>();
         interaction = GetComponent<PlayerInteraction>();
+        playerSpriteRenderer = GetComponentInChildren<SpriteRenderer>();
+        animator = GetComponent<Animator>();
         originalGravityScale = rb.gravityScale;
     }
 
@@ -63,6 +77,7 @@ public class PlayerSlipState : MonoBehaviour
             return;
 
         IsSlipping = true;
+        animator.SetBool("isSlip", true);
         slipTimer = 0f;
         horizontalInput = 0f;
 
@@ -73,8 +88,39 @@ public class PlayerSlipState : MonoBehaviour
 
         SetControlComponents(false);
 
-        rb.gravityScale = initialSlipGravity ; // 등반 중 0이었던 중력 복구
-        rb.linearVelocity = direction.normalized * slipSpeed;
+        // 플레이어가 바라보는 방향의 반대쪽으로 미끄러짐
+        float horizontalDirection =
+            playerSpriteRenderer.flipX ? 1f : -1f;
+
+        // 기존 방향의 기울기는 유지하고 좌우 방향만 반전
+        direction.x = Mathf.Abs(direction.x) * horizontalDirection;
+
+        // X 방향이 0이면 기본 수평 방향을 부여
+        if (Mathf.Approximately(direction.x, 0f))
+            direction.x = horizontalDirection;
+
+        // 현재 플레이어 위치 상태에 따라 강도 결정
+        float selectedSpeed = slipSpeed;
+        float selectedGravity = initialSlipGravity;
+
+        if (player.isLower)
+        {
+            selectedSpeed = lowerSlipSpeed;
+            selectedGravity = lowerSlipGravity;
+        }
+        else if (player.isMiddle)
+        {
+            selectedSpeed = middleSlipSpeed;
+            selectedGravity = middleSlipGravity;
+        }
+        else if (player.isUpper)
+        {
+            selectedSpeed = upperSlipSpeed;
+            selectedGravity = upperSlipGravity;
+        }
+
+        rb.gravityScale = selectedGravity;
+        rb.linearVelocity = direction.normalized * selectedSpeed;
 
         OnSlipStarted?.Invoke();
     }
@@ -141,10 +187,14 @@ public class PlayerSlipState : MonoBehaviour
 
     private void EndSlip()
     {
+
+        Debug.Log("착지발동");
         if (!IsSlipping)
             return;
 
         IsSlipping = false;
+        animator.SetBool("isSlip", false);
+        player.ForceExitClimbing();
         rb.linearVelocity = Vector2.zero;
 
         SetControlComponents(true);
