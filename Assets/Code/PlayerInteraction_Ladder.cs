@@ -3,28 +3,29 @@ using UnityEngine.InputSystem;
 
 public class PlayerInteraction : MonoBehaviour
 {
-    public Transform carryPoint;
+    [Header("»ç´Ù¸® µé±â À§Ä¡")]
+    public Transform leftCarryPoint;
+    public Transform rightCarryPoint;
+    private Transform carryPoint;
+
+    private SpriteRenderer playerSpriteRenderer;
+    private Vector3 ladderWorldScale;
+    private float currentCarryAngle;
+    private bool previousFacingLeft;
 
     private GameObject nearbyLadder;
     private GameObject carriedLadder;
     private Player Player;
+    private Animator animator;
 
-    [Header("»ç´Ù¸® Á¶Àý")]
-    public float lengthChangeSpeed = 1f;
-    public float minLengthScale = 0.5f;
-    public float maxLengthScale = 2.5f;
-    [Header("Ladder Rotation")]
-    public float rotateSpeed = 100f;
-    public float minRotation = -90f;
-    public float maxRotation = 90f;
-    
-
-    private Vector3 ladderBaseScale;
-    private float currentLengthScale = 1f;
+    public LadderPartsController ladderParts;
 
     [Header("Ladder Supply")]
     public GameObject ladderInSupply;
     private bool isNearLadderSupply = false;
+
+    [Header("»óÈ£ÀÛ¿ë ¾È³»")]
+    public GameObject pickupPrompt;
 
     public enum LadderMode
     {
@@ -41,12 +42,30 @@ public class PlayerInteraction : MonoBehaviour
     private void Awake()
     {
         Player = GetComponent<Player>();
+        playerSpriteRenderer = GetComponentInChildren<SpriteRenderer>();
+        animator = GetComponent<Animator>();
     }
     void Update()
     {
-        // W?¤ë? ?Œë?????
+        // »ç´Ù¸®¸¦ µé ¼ö ÀÖ´Â »óÈ²ÀÎÁö È®ÀÎ
+        bool canPickup =
+            carriedLadder == null &&
+            !Player.isClimbing &&
+            (nearbyLadder != null || isNearLadderSupply);
+
+        // ¾È³»¹® Ç¥½Ã
+        if (pickupPrompt != null)
+        {
+            pickupPrompt.SetActive(canPickup);
+        }
+
+        if (carriedLadder != null)
+            UpdateCarryPoint();
+        
+
         if (Keyboard.current == null)
             return;
+
 
         if (Keyboard.current.wKey.wasPressedThisFrame)
         {
@@ -55,19 +74,25 @@ public class PlayerInteraction : MonoBehaviour
                 if (isNearLadderSupply && ladderInSupply != null)
                 {
                     PickUpLadder(ladderInSupply);
+                    animator.SetBool("isPush", true);
                 }
                 else if (nearbyLadder != null)
                 {
                     PickUpLadder(nearbyLadder);
+                    animator.SetBool("isPush", true);
                 }
             }
             else
             {
+                animator.SetBool("isAd", true);
+                animator.SetBool("isPush", false);
+
                 ChangeMode();
 
                 if (currentMode == LadderMode.Place)
                 {
                     PlaceLadder();
+                    animator.SetBool("isAd", false);
                 }
             }
         }
@@ -93,6 +118,10 @@ public class PlayerInteraction : MonoBehaviour
         {
             nearbyLadder = other.gameObject;
         }
+        if (other.CompareTag("LadderPath"))
+        {
+            nearbyLadder = other.transform.root.gameObject;
+        }
         if (other.CompareTag("LadderSupply"))
         {
             isNearLadderSupply = true;
@@ -104,6 +133,11 @@ public class PlayerInteraction : MonoBehaviour
         if (other.gameObject == nearbyLadder)
         {
             nearbyLadder = null;
+        }
+        if (other.CompareTag("LadderPath"))
+        {
+            if (other.transform.root.gameObject == nearbyLadder)
+                nearbyLadder = null;
         }
         if (other.CompareTag("LadderSupply"))
         {
@@ -119,17 +153,40 @@ public class PlayerInteraction : MonoBehaviour
         carriedLadder = targetLadder;
         targetLadder = null;
 
+        ladderParts = carriedLadder.GetComponentInChildren<LadderPartsController>(true);
+
+        if (ladderParts == null)
+        {
+            Debug.LogError("LadderPartsController¸¦ Ã£Áö ¸øÇß¾î!");
+            carriedLadder = null;
+            return;
+        }
+
+        ladderParts.SetLength(ladderParts.CurrentLength);
+
         LadderSlipData slipData = carriedLadder.GetComponent<LadderSlipData>();
+
         if (slipData != null)
             slipData.ClearResult();
 
-        SpriteRenderer sr = carriedLadder.GetComponent<SpriteRenderer>();
+        // »ç´Ù¸®ÀÇ ÇöÀç ¿ùµå Å©±â ÀúÀå
+        ladderWorldScale = carriedLadder.transform.lossyScale;
 
-        carriedLadder.transform.SetParent(carryPoint);
+        // ÇÃ·¹ÀÌ¾î ¹æÇâ¿¡ ¸Â´Â ¼Õ ¼±ÅÃ
+        carryPoint = GetCarryPoint();
+        previousFacingLeft = playerSpriteRenderer.flipX;
+
+        // »ç´Ù¸® ¿¬°á
+        carriedLadder.transform.SetParent(carryPoint, false);
         carriedLadder.transform.localPosition = Vector3.zero;
 
-        ladderBaseScale = carriedLadder.transform.localScale;
-        currentLengthScale = 1f;
+        // ¿ùµå Å©±â º¸Á¸
+        SetLadderWorldScale();
+
+        // È¸Àü ÃÊ±âÈ­
+        currentCarryAngle = 0f;
+        carryPoint.localRotation = Quaternion.identity;
+
 
         Rigidbody2D ladderRb =
             carriedLadder.GetComponent<Rigidbody2D>();
@@ -175,39 +232,36 @@ public class PlayerInteraction : MonoBehaviour
 
     void AngleMode()
     {
-        // ê°ë„ ì¡°ì ˆ ëª¨ë“œ
-        float rotationInput = 0f;
+        if (ladderParts == null || carriedLadder == null)
+            return;
+
+        float input = 0f;
 
         if (Keyboard.current.aKey.isPressed)
-            rotationInput = 1f;
+            input = 1f;
 
         if (Keyboard.current.dKey.isPressed)
-            rotationInput = -1f;
+            input = -1f;
 
-        // ÇöÀç °¢µµ °¡Á®¿À±â
-        float currentAngle = carryPoint.localEulerAngles.z;
+        ladderParts.AdjustRotation(
+            carriedLadder.transform,
+            input,
+            Time.deltaTime
+        );
 
-        // 0~360µµ¸¦ -180~180µµ·Î º¯È¯
-        if (currentAngle > 180f)
-            currentAngle -= 360f;
+        currentCarryAngle = carriedLadder.transform.localEulerAngles.z;
 
-        // È¸Àü °¢µµ °è»ê
-        float nextAngle = currentAngle +
-            rotationInput * rotateSpeed * Time.deltaTime;
-
-        // -90µµ ~ 90µµ·Î Á¦ÇÑ
-        nextAngle = Mathf.Clamp(nextAngle, -90f, 90f);
-
-        // È¸Àü Àû¿ë
-        carryPoint.localRotation = Quaternion.Euler(0f, 0f, nextAngle);
-
+        if (currentCarryAngle > 180f)
+            currentCarryAngle -= 360f;
     }
 
     void LengthMode()
     {
+        if (ladderParts == null)
+            return;
+
         float input = 0f;
 
-        // »ç´Ù¸®°¡ ¿ÞÂÊÀ» ÇâÇÏ°í ÀÖ´ÂÁö È®ÀÎ
         bool isFacingLeft = carryPoint.lossyScale.x < 0f;
 
         if (Keyboard.current.dKey.isPressed)
@@ -216,30 +270,18 @@ public class PlayerInteraction : MonoBehaviour
         if (Keyboard.current.aKey.isPressed)
             input = isFacingLeft ? 1f : -1f;
 
-        currentLengthScale +=
-            input * lengthChangeSpeed * Time.deltaTime;
-
-        currentLengthScale = Mathf.Clamp(
-            currentLengthScale,
-            minLengthScale,
-            maxLengthScale
-        );
-
-        Vector3 newScale = ladderBaseScale;
-
-        newScale.y = ladderBaseScale.y * currentLengthScale;
-
-        carriedLadder.transform.localScale = newScale;
+        ladderParts.AdjustLength(input, Time.deltaTime);
     }
 
     void PlaceLadder()
     {
-        LadderSlipData slipData = carriedLadder.GetComponent<LadderSlipData>();
-        if (slipData != null)
-            slipData.EvaluatePlacement();
-
         if (carriedLadder == null)
             return;
+
+        LadderSlipData slipData = carriedLadder.GetComponent<LadderSlipData>();
+
+        if (slipData != null)
+            slipData.EvaluatePlacement();
 
         // ë¶€ëª?ê´€ê³??´ì œ
         carriedLadder.transform.SetParent(null, true);
@@ -269,5 +311,56 @@ public class PlayerInteraction : MonoBehaviour
         currentMode = LadderMode.Normal;
         Player.canMove = true;
     }
+    void UpdateCarryPoint()
+    {
+        if (carriedLadder == null || playerSpriteRenderer == null)
+            return;
 
+        bool facingLeft = playerSpriteRenderer.flipX;
+
+        Transform nextPoint = facingLeft
+            ? leftCarryPoint
+            : rightCarryPoint;
+
+        if (carryPoint == nextPoint)
+            return;
+
+        // ¹æÇâ ÀüÈ¯ ½Ã °¢µµ ¹ÝÀü
+        float currentAngle = carriedLadder.transform.localEulerAngles.z;
+
+        if (currentAngle > 180f)
+            currentAngle -= 360f;
+
+        currentCarryAngle = -currentAngle;
+
+        // »õ·Î¿î ¼ÕÀ¸·Î ÀÌµ¿
+        carryPoint = nextPoint;
+
+        carriedLadder.transform.SetParent(carryPoint, false);
+        carriedLadder.transform.localPosition = Vector3.zero;
+
+        SetLadderWorldScale();
+
+        // »ç´Ù¸® ÀÚÃ¼¿¡ È¸Àü Àû¿ë
+        carriedLadder.transform.localRotation = Quaternion.Euler(
+            0f, 0f, currentCarryAngle
+        );
+    }
+
+    Transform GetCarryPoint()
+    {
+        bool facingLeft = playerSpriteRenderer.flipX;
+
+        return facingLeft ? leftCarryPoint : rightCarryPoint;
+    }
+    void SetLadderWorldScale()
+    {
+        Vector3 parentScale = carriedLadder.transform.parent.lossyScale;
+
+        carriedLadder.transform.localScale = new Vector3(
+            ladderWorldScale.x / parentScale.x,
+            ladderWorldScale.y / parentScale.y,
+            ladderWorldScale.z / parentScale.z
+        );
+    }
 }

@@ -1,5 +1,7 @@
 using System.IO;
+using Unity.VisualScripting;
 using Unity.VisualScripting.InputSystem;
+using UnityEditor.Tilemaps;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.U2D;
@@ -9,6 +11,9 @@ public class Player : MonoBehaviour
     public float moveSpeed;
     public bool canMove = true;
     public bool isClimbing = false;
+    public bool isUpper = false;
+    public bool isMiddle = false;
+    public bool isLower = false;
 
     private Rigidbody2D rb;
     private int moveInput;
@@ -25,6 +30,7 @@ public class Player : MonoBehaviour
 
     private Transform currentLadderStart;
     private Transform currentLadderEnd;
+    private Transform currentLadderCheck;
     private LadderSlipData currentLadderSlipData;
 
 
@@ -56,10 +62,21 @@ public class Player : MonoBehaviour
         moveInput = 0;
 
         if (Keyboard.current.aKey.isPressed)
+        {
             moveInput = -1;
+            if (!isClimbing)
+                sprite.flipX = true;
+        }
 
         if (Keyboard.current.dKey.isPressed)
+        {
             moveInput = 1;
+            if (!isClimbing)
+                sprite.flipX = false;
+        }
+        
+            
+        animator.SetBool("isWalk", moveInput != 0);
     }
 
     private void FixedUpdate()
@@ -92,15 +109,42 @@ public class Player : MonoBehaviour
         }
     }
 
+    private void OnTriggerStay2D(Collider2D other)
+    {
+        if (other.CompareTag("Lower"))
+        {
+            isLower = true;
+            isMiddle = false;
+            isUpper = false;
+        }
+        else if (other.CompareTag("Middle"))
+        {
+            isLower = false;
+            isMiddle = true;
+            isUpper = false;
+        }
+        else if (other.CompareTag("Upper"))
+        {
+            isLower = false;
+            isMiddle = false;
+            isUpper = true;
+        }
+    }
 
     private void OnTriggerEnter2D(Collider2D other)
     {
         // LadderStart에 진입하면 사다리 탑승
         if (other.CompareTag("LadderStart"))
         {
+            PlayerSlipState slipState = GetComponent<PlayerSlipState>();
+
+            if (slipState != null && slipState.IsSlipping)
+                return;
+
             if (isClimbing || moveInput == 0)
             {
                 isClimbing = false;
+                animator.SetBool("isClimb", false);
                 currentLadderPath = null;
 
                 rb.gravityScale = originalGravityScale;
@@ -111,6 +155,7 @@ public class Player : MonoBehaviour
             currentLadderPath = other.transform.parent.Find("LadderPath");
             currentLadderStart = other.transform;
             currentLadderEnd = other.transform.parent.Find("LadderEnd");
+            currentLadderCheck = other.transform.parent.Find("LadderCheck");
             currentLadderSlipData =
                 other.transform.parent.GetComponent<LadderSlipData>();
 
@@ -135,11 +180,12 @@ public class Player : MonoBehaviour
                 return;
 
             isClimbing = true;
+            animator.SetBool("isClimb", true);
 
             rb.gravityScale = 0f;
             rb.linearVelocity = Vector2.zero;
 
-            transform.position = other.transform.position;
+            transform.position = currentLadderPath.transform.position;
         }
 
         // LadderEnd에 진입하면 사다리 하차
@@ -153,6 +199,8 @@ public class Player : MonoBehaviour
             currentLadderStart = null;
             currentLadderEnd = null;
             currentLadderSlipData = null;
+            currentLadderCheck = null;
+            animator.SetBool("isClimb", false);
 
             rb.gravityScale = originalGravityScale;
             rb.linearVelocity = Vector2.zero;
@@ -168,7 +216,9 @@ public class Player : MonoBehaviour
         currentLadderStart = null;
         currentLadderEnd = null;
         currentLadderSlipData = null;
+        currentLadderCheck = null; ;
         canMove = true;
+        animator.SetBool("isClimb", false);
 
         rb.gravityScale = originalGravityScale;
     }
@@ -180,7 +230,8 @@ public class Player : MonoBehaviour
             currentLadderSlipData == null ||
             !currentLadderSlipData.HasResult ||
             currentLadderStart == null ||
-            currentLadderEnd == null)
+            currentLadderEnd == null ||
+            currentLadderCheck == null)
         {
             return false;
         }
@@ -193,7 +244,7 @@ public class Player : MonoBehaviour
 
         // 사다리의 시작점과 끝점
         Vector2 start = currentLadderStart.position;
-        Vector2 end = currentLadderEnd.position;
+        Vector2 end = currentLadderCheck.position;
 
         Vector2 ladderDirection = end - start;
 

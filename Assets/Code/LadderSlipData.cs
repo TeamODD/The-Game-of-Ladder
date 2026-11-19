@@ -21,7 +21,7 @@ public class LadderSlipData : MonoBehaviour
     private Transform ladderStart;
     private Transform ladderCheck;
     private Transform ladderEnd;
-    private float ladderEndExtraHeight = 0.3f;
+    private float ladderEndExtraHeight = 0.6f;
 
     private void Awake()
     {

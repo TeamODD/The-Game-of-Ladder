@@ -21,7 +21,7 @@ public class ParallaxBackground : MonoBehaviour
 
         transform.position += new Vector3(
             cameraMovement.x * parallaxSpeed,
-            cameraMovement.y * parallaxSpeed,
+            0f,
             0f
         );
 

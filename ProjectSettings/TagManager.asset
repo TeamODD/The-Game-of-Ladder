@@ -11,6 +11,9 @@ TagManager:
   - LadderEnd
   - LadderSupply
   - LadderCheck
+  - Lower
+  - Middle
+  - Upper
   layers:
   - Default
   - TransparentFX
@@ -57,7 +60,7 @@ TagManager:
   - name: Default
     uniqueID: 0
     locked: 0
-  - name: New Layer 2
+  - name: Player
     uniqueID: 988754233
     locked: 0
   - name: New Layer 3
