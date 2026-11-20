@@ -1,3 +1,4 @@
+
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -10,26 +11,27 @@ public class LadderAnchorZone : MonoBehaviour
         Upper
     }
 
-    GameObject platform;
-
     [Header("판정 사각형 종류")]
     public ZoneType zoneType = ZoneType.Lower;
-
-    private float lowerWidth = 0.8f;
-    private float middleWidth = 0.6f;
-    private float upperWidth = 0.3f;
 
     [Header("오프셋")]
     public Vector2 offset = Vector2.zero;
 
+    private GameObject platform;
     private Vector2 size;
+
+    private const float LowerWidth = 0.8f;
+    private const float MiddleWidth = 0.6f;
+    private const float UpperWidth = 0.3f;
 
     private static readonly List<LadderAnchorZone> allZones =
         new List<LadderAnchorZone>();
 
     private void OnEnable()
     {
-        allZones.Add(this);
+        if (!allZones.Contains(this))
+            allZones.Add(this);
+
         ApplyPreset();
     }
 
@@ -38,17 +40,19 @@ public class LadderAnchorZone : MonoBehaviour
         allZones.Remove(this);
     }
 
-    // Inspector에서 종류나 프리셋 크기를 변경하면 자동 적용
+    // Inspector에서 설정이 변경되면 크기 갱신
     private void OnValidate()
     {
         ApplyPreset();
     }
 
-    // 선택한 종류에 맞는 크기 적용
+    // 판정 영역의 크기 설정
     public void ApplyPreset()
     {
-        if (platform == null)
-            platform = transform.parent.gameObject;
+        if (transform.parent == null)
+            return;
+
+        platform = transform.parent.gameObject;
 
         BoxCollider2D platformCollider =
             platform.GetComponent<BoxCollider2D>();
@@ -58,43 +62,45 @@ public class LadderAnchorZone : MonoBehaviour
 
         float platformHeight = platformCollider.bounds.size.y;
 
-        switch (zoneType)
+        float width = zoneType switch
         {
-            case ZoneType.Lower:
-                size = new Vector2(lowerWidth, platformHeight);
-                break;
+            ZoneType.Lower => LowerWidth,
+            ZoneType.Middle => MiddleWidth,
+            ZoneType.Upper => UpperWidth,
+            _ => LowerWidth
+        };
 
-            case ZoneType.Middle:
-                size = new Vector2(middleWidth, platformHeight);
-                break;
-
-            case ZoneType.Upper:
-                size = new Vector2(upperWidth, platformHeight);
-                break;
-        }
+        size = new Vector2(width, platformHeight);
     }
 
+    // 월드 좌표 기준 판정 사각형 반환
     public Rect GetWorldRect()
     {
         Vector2 center = (Vector2)transform.position + offset;
         return new Rect(center - size * 0.5f, size);
     }
 
+    // 지정한 위치에서 가장 가까운 판정 영역 검색
     public static LadderAnchorZone FindNearest(
         Vector2 point,
         float maxDistance)
     {
         LadderAnchorZone nearest = null;
-        float best = maxDistance;
+        float bestDistance = maxDistance;
 
         foreach (LadderAnchorZone zone in allZones)
         {
-            float d = New_LadderSlipCalculator.DistanceOutside(
-                zone.GetWorldRect(), point);
+            if (zone == null)
+                continue;
 
-            if (d <= best)
+            float distance = New_LadderSlipCalculator.DistanceOutside(
+                zone.GetWorldRect(),
+                point
+            );
+
+            if (distance <= bestDistance)
             {
-                best = d;
+                bestDistance = distance;
                 nearest = zone;
             }
         }
@@ -104,12 +110,12 @@ public class LadderAnchorZone : MonoBehaviour
 
     private void OnDrawGizmos()
     {
-        Rect r = GetWorldRect();
+        Rect rect = GetWorldRect();
 
         Gizmos.color = new Color(0f, 1f, 1f, 0.25f);
-        Gizmos.DrawCube(r.center, r.size);
+        Gizmos.DrawCube(rect.center, rect.size);
 
         Gizmos.color = Color.cyan;
-        Gizmos.DrawWireCube(r.center, r.size);
+        Gizmos.DrawWireCube(rect.center, rect.size);
     }
 }

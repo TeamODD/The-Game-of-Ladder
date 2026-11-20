@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ccc78a1d8856b8d4c8330ffc325b17d7, type: 3}
-  m_Name: NarrationData 19
+  m_Name: Lower004
   m_EditorClassIdentifier: Assembly-CSharp::NarrationData
-  narrationID: 
-  narrationText: 
+  narrationID: Lower004
+  narrationText: "\uC2DC\uD5D8 \uC804\uB0A0\uC5D0\uB3C4 \uB2F9\uC2E0\uC740 \uC57C\uAC04\uC870\uC600\uC2B5\uB2C8\uB2E4.\n\uC2DC\uD5D8\uC7A5\uC5D0 \uB3C4\uCC29\uD574 \uAC00\uC7A5 \uBA3C\uC800 \uD55C \uC77C\uC740 \uB540\uC5D0 \uC816\uC740 \uC218\uD5D8\uD45C\uB97C \uCC45\uC0C1 \uC704\uC5D0 \uD3B4\uC11C \uB9D0\uB9AC\uB294 \uAC70\uC600\uC8E0."

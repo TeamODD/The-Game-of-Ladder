@@ -1,6 +1,6 @@
 
-using UnityEngine;
 using System.Collections;
+using UnityEngine;
 
 public class BGMManager : MonoBehaviour
 {
@@ -20,9 +20,9 @@ public class BGMManager : MonoBehaviour
     public float fadeDuration = 2f;
     public float maxVolume = 0.5f;
 
-
     private void Awake()
     {
+        // 싱글톤 중복 생성 방지
         if (Instance != null && Instance != this)
         {
             Destroy(gameObject);
@@ -30,6 +30,7 @@ public class BGMManager : MonoBehaviour
         }
 
         Instance = this;
+
         player = FindAnyObjectByType<Player>();
         audioSource = GetComponent<AudioSource>();
 
@@ -60,6 +61,7 @@ public class BGMManager : MonoBehaviour
             PlayBGM(upper);
     }
 
+    // 배경음악 변경 요청
     public void PlayBGM(AudioClip clip)
     {
         if (clip == null || requestedClip == clip)
@@ -72,10 +74,26 @@ public class BGMManager : MonoBehaviour
 
         fadeCoroutine = StartCoroutine(ChangeBGM(clip));
     }
+
+    // 배경음악 페이드 아웃 및 페이드 인
     private IEnumerator ChangeBGM(AudioClip newClip)
     {
-        // 기존 음악 페이드 아웃
-        float startVolume = audioSource.volume;
+        yield return FadeVolume(audioSource.volume, 0f);
+
+        audioSource.Stop();
+        audioSource.clip = newClip;
+        audioSource.volume = 0f;
+        audioSource.Play();
+
+        yield return FadeVolume(0f, maxVolume);
+
+        audioSource.volume = maxVolume;
+        fadeCoroutine = null;
+    }
+
+    // 볼륨 페이드 처리
+    private IEnumerator FadeVolume(float startVolume, float targetVolume)
+    {
         float timer = 0f;
 
         while (timer < fadeDuration)
@@ -84,39 +102,14 @@ public class BGMManager : MonoBehaviour
 
             audioSource.volume = Mathf.Lerp(
                 startVolume,
-                0f,
+                targetVolume,
                 timer / fadeDuration
             );
 
             yield return null;
         }
 
-        // 기존 음악 정지
-        audioSource.Stop();
-
-        // 새로운 음악 재생
-        audioSource.clip = newClip;
-        audioSource.volume = 0f;
-        audioSource.Play();
-
-        // 새 음악 페이드 인
-        timer = 0f;
-
-        while (timer < fadeDuration)
-        {
-            timer += Time.deltaTime;
-
-            audioSource.volume = Mathf.Lerp(
-                0f,
-                maxVolume,
-                timer / fadeDuration
-            );
-
-            yield return null;
-        }
-
-        audioSource.volume = maxVolume;
-        fadeCoroutine = null;
+        audioSource.volume = targetVolume;
     }
 
     public void PlayLower()
