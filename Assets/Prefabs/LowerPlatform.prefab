@@ -177,7 +177,6 @@ MonoBehaviour:
   Lower: 0000000000y
   Middle: 
   Upper: 
-  narrationManager: {fileID: 804370386846218936, guid: 368b07835f6cb5d409bffa36306f089c, type: 3}
 --- !u!1 &5632970330651192577
 GameObject:
   m_ObjectHideFlags: 0

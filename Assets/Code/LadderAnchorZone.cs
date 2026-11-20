@@ -20,9 +20,9 @@ public class LadderAnchorZone : MonoBehaviour
     private GameObject platform;
     private Vector2 size;
 
-    private const float LowerWidth = 0.8f;
-    private const float MiddleWidth = 0.6f;
-    private const float UpperWidth = 0.3f;
+    private const float LowerWidth = 0.3f;
+    private const float MiddleWidth = 0.2f;
+    private const float UpperWidth = 0.15f;
 
     private static readonly List<LadderAnchorZone> allZones =
         new List<LadderAnchorZone>();

@@ -7,7 +7,7 @@ using UnityEngine;
 )]
 public class NarrationData : ScriptableObject
 {
-    [Header("³ª·¹ÀÌ¼Ç Á¤º¸")]
+    [Header("ë‚˜ë ˆì´ì…˜ ì •ë³´")]
     public string narrationID;
 
     [TextArea(3, 6)]
