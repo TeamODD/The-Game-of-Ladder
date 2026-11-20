@@ -14,6 +14,8 @@ TagManager:
   - Lower
   - Middle
   - Upper
+  - WalkSurface
+  - Boundary
   layers:
   - Default
   - TransparentFX

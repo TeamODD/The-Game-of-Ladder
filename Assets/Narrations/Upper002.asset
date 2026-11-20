@@ -1,0 +1,16 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ccc78a1d8856b8d4c8330ffc325b17d7, type: 3}
+  m_Name: Upper002
+  m_EditorClassIdentifier: Assembly-CSharp::NarrationData
+  narrationID: Upper002
+  narrationText: "\uBD80\uC790 \uC21C\uC704\uC5D0 \uCC98\uC74C \uC774\uB984\uC774 \uC2E4\uB9B0 \uB0A0, \uB2F9\uC2E0\uC740 \uC790\uAE30 \uC704\uC5D0 \uBA87 \uBA85\uC774\uB098 \uC788\uB294\uC9C0 \uC138\uC5B4\uBD24\uC2B5\uB2C8\uB2E4.\n\uC774\uD2BF\uB0A0\uBD80\uD130 \uB2F9\uC2E0\uC740 \uBAA8\uC544\uB454 \uB3C8\uC73C\uB85C \uB2E4\uB978 \uD68C\uC0AC\uC758 \uC8FC\uC2DD\uC744 \uC0AC\uB4E4\uC600\uC8E0."

@@ -9,7 +9,7 @@ public class SceneChanger : MonoBehaviour
     // (게임 시작)메인 게임 씬으로 넘어감
     public void StartGame()
     {
-        SceneManager.LoadScene("Scene_ywrain");
+        SceneManager.LoadScene("InGame");
     }
 
     // 타이틀 씬으로 넘어감
@@ -22,5 +22,10 @@ public class SceneChanger : MonoBehaviour
     public void EndGame()
     {
         SceneManager.LoadScene("End");
+    }
+
+    public void ExitGame()
+    {
+        Application.Quit();
     }
 }

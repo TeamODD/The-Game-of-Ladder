@@ -1,0 +1,76 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &2097119695387910916
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 9125858769824607509}
+  - component: {fileID: 804370386846218936}
+  m_Layer: 0
+  m_Name: NarrationManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &9125858769824607509
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2097119695387910916}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 800.2163, y: 276.8805, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &804370386846218936
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2097119695387910916}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 337f7ce7c5a778a438f76c61d6ec966f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::NarrationManager
+  narrationPanel: {fileID: 0}
+  narrationText: {fileID: 0}
+  slipNarrations:
+  - {fileID: 11400000, guid: f42c302554d08ba4785363f6757cc9fd, type: 2}
+  - {fileID: 11400000, guid: efec1be5b2e8bbc4389c25482db8d562, type: 2}
+  - {fileID: 11400000, guid: f805dcd63b49e1f45809da1b79afcad9, type: 2}
+  - {fileID: 11400000, guid: 9938d7fbe33f9ef4e90c59c42f9f2dc9, type: 2}
+  - {fileID: 11400000, guid: 0fe27ec7c78819447b68b622d13f0978, type: 2}
+  - {fileID: 11400000, guid: 0d4082e51738662478718360597b9fd1, type: 2}
+  - {fileID: 11400000, guid: f7f5ae22cd8033246b81cbb3a2ffac17, type: 2}
+  - {fileID: 11400000, guid: 8d9b2d24563f35748985dbfd5319d957, type: 2}
+  LowerNarrations:
+  - {fileID: 11400000, guid: d5e79f5733aefa9428966dfc0d0266bd, type: 2}
+  - {fileID: 11400000, guid: 12644efe11e8f3347a610301a8883f3d, type: 2}
+  - {fileID: 11400000, guid: e5b66f1f6ca17ec47b69cf31ba8e6b21, type: 2}
+  - {fileID: 11400000, guid: 35b739e5fdc49bd4bbe209957d66d8cf, type: 2}
+  - {fileID: 11400000, guid: 16c127b1504ec3046a740359f89fb0ce, type: 2}
+  MiddleNarrations:
+  - {fileID: 11400000, guid: afdc8acf863968f41adb6553b0eda5b0, type: 2}
+  - {fileID: 11400000, guid: 9e5729748e51a4645aefbfafa1a219af, type: 2}
+  - {fileID: 11400000, guid: 10b450a26f8b27247a9f37a19554cbb5, type: 2}
+  - {fileID: 11400000, guid: a285159f0d9067b4ebe2f7849da1a3f9, type: 2}
+  - {fileID: 11400000, guid: e5c075cad51eae348ad1ac7893c4a7fd, type: 2}
+  - {fileID: 11400000, guid: 3cfa218fd364c744d9b35496a1eafcc2, type: 2}
+  UpperNarrations:
+  - {fileID: 11400000, guid: 31ea52d3be77cf24d9b94516b0795316, type: 2}
+  - {fileID: 11400000, guid: 8052d624a2872fc43b1625b7f488e970, type: 2}
+  - {fileID: 11400000, guid: fb23140eeb3103246bb732f608dffa7a, type: 2}
+  - {fileID: 11400000, guid: d17a14aeb0f23e243b46df573284a9e4, type: 2}
+  - {fileID: 11400000, guid: a543017051af034498d940f0ca4148c9, type: 2}
