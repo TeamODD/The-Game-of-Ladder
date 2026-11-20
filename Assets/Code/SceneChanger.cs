@@ -9,7 +9,7 @@ public class SceneChanger : MonoBehaviour
     public void StartGame()
     {
         // 검은 화면 없이 타이틀이 사라지며 게임 씬이 드러남
-        ScreenFader.Instance.CrossFadeToScene("Scene_ywrain");
+        ScreenFader.Instance.CrossFadeToScene("InGame");
     }
 
     // 타이틀 씬으로 넘어감

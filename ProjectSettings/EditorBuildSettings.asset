@@ -9,7 +9,7 @@ EditorBuildSettings:
     path: Assets/Scenes/Title.unity
     guid: 5e14e6dcdfa0880499976463954dc157
   - enabled: 1
-    path: Assets/Scenes/Scene_ywrain.unity
+    path: Assets/Scenes/InGame.unity
     guid: fb6ed71a79df07d4d800803cc303dff1
   - enabled: 1
     path: Assets/Scenes/End.unity
