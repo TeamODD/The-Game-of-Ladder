@@ -1,0 +1,16 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ccc78a1d8856b8d4c8330ffc325b17d7, type: 3}
+  m_Name: Middle006
+  m_EditorClassIdentifier: Assembly-CSharp::NarrationData
+  narrationID: Middle006
+  narrationText: "\uB2F9\uC2E0\uC740 \uC790\uB9AC\uAC00 \uBE4C \uB3D9\uC548 \uC790\uAE30\uAC00 \uD68C\uC0AC\uB97C \uB9E1\uACA0\uB2E4\uACE0 \uD588\uC2B5\uB2C8\uB2E4.\n\uC784\uC6D0\uB4E4\uC740 \uACB0\uAD6D \uAC19\uC740 \uC774\uB984\uC5D0 \uD45C\uB97C \uB358\uC84C\uC2B5\uB2C8\uB2E4. \uD3C9\uC18C\uC5D0\uB3C4 \uC790\uAE30 \uBD80\uC11C\uC5D0\uC11C \uC77C\uC774 \uB9C9\uD788\uBA74 \uBD80\uB974\uB358 \uC0AC\uB78C\uC774\uC5C8\uC73C\uB2C8\uAE4C\uC694."

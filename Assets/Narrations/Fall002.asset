@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ccc78a1d8856b8d4c8330ffc325b17d7, type: 3}
-  m_Name: NarrationData 9
+  m_Name: Fall002
   m_EditorClassIdentifier: Assembly-CSharp::NarrationData
-  narrationID: 
-  narrationText: 
+  narrationID: Fall002
+  narrationText: "\uC6D0\uC22D\uC774\uB3C4 \uB098\uBB34\uC5D0\uC11C \uB5A8\uC5B4\uC9C4\uB2E4."
