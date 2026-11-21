@@ -27,6 +27,12 @@ public class EndingSequence : MonoBehaviour
     [SerializeField] private float fadeDuration = 1.5f;
 
     private bool isPlaying;
+    private BGMManager bgmManager;
+
+    private void Awake()
+    {
+        bgmManager = FindAnyObjectByType<BGMManager>();
+    }
 
     // narrations를 각각 secondsEach초씩 출력하면서 엔딩 연출을 진행한다.
     public void Play(NarrationManager narrationManager, float secondsEach, params NarrationData[] narrations)
@@ -38,6 +44,7 @@ public class EndingSequence : MonoBehaviour
         narrationManager.ShowNarrationSequence(secondsEach, narrations);
         StartCoroutine(ZoomInRoutine());
         StartCoroutine(EndingRoutine(narrationManager));
+        bgmManager.StopAllBGM(10f);
     }
 
     private IEnumerator EndingRoutine(NarrationManager narrationManager)
