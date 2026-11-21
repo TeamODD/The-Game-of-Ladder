@@ -106,6 +106,11 @@ public class Player : MonoBehaviour
             return;
         }
 
+        if (Keyboard.current.kKey.isPressed)
+        {
+            ExitLadder();
+        }
+
         moveInput = 0;
 
         if (Keyboard.current.aKey.isPressed)
