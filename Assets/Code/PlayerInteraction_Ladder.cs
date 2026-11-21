@@ -319,7 +319,7 @@ public class PlayerInteraction : MonoBehaviour
 
         ladderParts.AdjustRotation(
             carriedLadder.transform,
-            input,
+            input * player.SpeedMultiplier,
             Time.deltaTime
         );
 
@@ -354,7 +354,10 @@ public class PlayerInteraction : MonoBehaviour
         if (Keyboard.current.aKey.isPressed)
             input = isFacingLeft ? 1f : -1f;
 
-        ladderParts.AdjustLength(input, Time.deltaTime);
+        ladderParts.AdjustLength(
+    input * player.SpeedMultiplier,
+    Time.deltaTime
+);
     }
 
 

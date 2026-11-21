@@ -7,7 +7,15 @@ public class Player : MonoBehaviour
 {
     [Header("이동")]
     public float moveSpeed = 5f;
+    public float slowMultiplier = 0.5f;
     public bool canMove = true;
+
+    public bool IsSlow => Keyboard.current != null &&
+    Keyboard.current.leftShiftKey.isPressed ||
+    Keyboard.current != null &&
+    Keyboard.current.rightShiftKey.isPressed;
+
+    public float SpeedMultiplier => IsSlow ? slowMultiplier : 1f;
 
     [Header("상태")]
     public bool isClimbing = false;
@@ -51,6 +59,8 @@ public class Player : MonoBehaviour
 
     private void FixedUpdate()
     {
+        float currentSpeed = moveSpeed * SpeedMultiplier;
+
         if (isClimbing && currentLadderPath != null)
         {
             if (CheckLadderSlip())
@@ -62,14 +72,14 @@ public class Player : MonoBehaviour
             int climbInput = slopesRight ? moveInput : -moveInput;
 
             rb.gravityScale = 0f;
-            rb.linearVelocity = pathDirection * climbInput * moveSpeed;
+            rb.linearVelocity = pathDirection * climbInput * currentSpeed;
         }
         else
         {
             rb.gravityScale = originalGravityScale;
 
             rb.linearVelocity = new Vector2(
-                moveInput * moveSpeed,
+                moveInput * currentSpeed,
                 rb.linearVelocity.y
             );
         }
@@ -153,6 +163,11 @@ public class Player : MonoBehaviour
     {
         if (other.CompareTag("LadderStart"))
         {
+            if (isClimbing)
+            {
+                ExitLadder();
+                return;
+            }
             EnterLadder(other);
         }
         else if (other.CompareTag("LadderEnd"))
@@ -177,7 +192,7 @@ public class Player : MonoBehaviour
 
         // 사다리 구성요소 참조
         currentLadderPath = ladderRoot.Find("LadderPath");
-        currentLadderStart = other.transform;
+        currentLadderStart = ladderRoot.Find("LadderStart");
         currentLadderCheck = ladderRoot.Find("LadderCheck");
         currentLadderSlipData = ladderRoot.GetComponent<LadderSlipData>();
 
@@ -317,18 +332,5 @@ public class Player : MonoBehaviour
         }
 
         return false;
-    }
-
-
-    // =========================
-    // 경계 처리
-    // =========================
-
-    private void OnTriggerExit2D(Collider2D other)
-    {
-        if (other.CompareTag("Boundary"))
-        {
-            transform.position = new Vector2(32f, 4.25f);
-        }
     }
 }
