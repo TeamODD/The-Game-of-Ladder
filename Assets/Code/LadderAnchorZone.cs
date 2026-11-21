@@ -20,9 +20,9 @@ public class LadderAnchorZone : MonoBehaviour
     private GameObject platform;
     private Vector2 size;
 
-    private const float LowerWidth = 0.3f;
-    private const float MiddleWidth = 0.2f;
-    private const float UpperWidth = 0.15f;
+    private const float LowerWidth = 0.4f;
+    private const float MiddleWidth = 0.3f;
+    private const float UpperWidth = 0.2f;
 
     private static readonly List<LadderAnchorZone> allZones =
         new List<LadderAnchorZone>();
@@ -60,7 +60,7 @@ public class LadderAnchorZone : MonoBehaviour
         if (platformCollider == null)
             return;
 
-        float platformHeight = platformCollider.bounds.size.y;
+        float platformHeight = platformCollider.bounds.size.y / 2;
 
         float width = zoneType switch
         {

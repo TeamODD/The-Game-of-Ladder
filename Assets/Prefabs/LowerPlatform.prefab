@@ -330,7 +330,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LadderAnchorZone
   zoneType: 0
-  offset: {x: 0, y: 0}
+  offset: {x: 0, y: 0.125}
 --- !u!1 &6218571989044063182
 GameObject:
   m_ObjectHideFlags: 0
@@ -484,4 +484,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LadderAnchorZone
   zoneType: 0
-  offset: {x: 0, y: 0}
+  offset: {x: 0, y: 0.125}
