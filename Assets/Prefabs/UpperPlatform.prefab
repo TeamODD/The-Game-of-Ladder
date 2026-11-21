@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 5151062270990693903}
   - component: {fileID: 7295660179363249532}
   - component: {fileID: 8351347025753422162}
+  - component: {fileID: 497115080448866858}
   m_Layer: 6
   m_Name: UpperPlatform
   m_TagString: Ground
@@ -177,6 +178,19 @@ MonoBehaviour:
   Lower: 
   Middle: 
   Upper: 0000000000y
+--- !u!114 &497115080448866858
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4733714426276166128}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0b2d37a2256c6c745b4ad7dd4fb48d35, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::UpperPlatform
+  dontSkip: 0
 --- !u!1 &5632970330651192577
 GameObject:
   m_ObjectHideFlags: 0
