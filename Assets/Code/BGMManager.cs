@@ -15,6 +15,7 @@ public class BGMManager : MonoBehaviour
 
     private Player player;
     private AudioClip requestedClip;
+    private bool isCleared = false;
 
     [Header("메인 배경음악")]
     public AudioClip lower;
@@ -83,7 +84,7 @@ public class BGMManager : MonoBehaviour
     // 메인 배경음악 변경
     public void PlayBGM(AudioClip clip)
     {
-        if (clip == null || requestedClip == clip)
+        if (clip == null || requestedClip == clip || isCleared)
             return;
 
         requestedClip = clip;
@@ -212,18 +213,59 @@ public class BGMManager : MonoBehaviour
         additionalAudioSource.volume = additionalVolume;
     }
 
-    public void PlayLower()
+    // 모든 배경음악 페이드아웃 및 정지
+    public void StopAllBGM(float duration = 2f)
     {
-        PlayBGM(lower);
+        isCleared = true;
+        // 기존 페이드 코루틴 중지
+        if (fadeCoroutine != null)
+        {
+            StopCoroutine(fadeCoroutine);
+            fadeCoroutine = null;
+        }
+
+        if (additionalCoroutine != null)
+        {
+            StopCoroutine(additionalCoroutine);
+            additionalCoroutine = null;
+        }
+
+        requestedClip = null;
+
+        StartCoroutine(FadeOutAllBGM(duration));
     }
 
-    public void PlayMiddle()
+    private IEnumerator FadeOutAllBGM(float duration)
     {
-        PlayBGM(middle);
+        float mainStartVolume = audioSource.volume;
+        float additionalStartVolume = additionalAudioSource.volume;
+        float timer = 0f;
+
+        while (timer < duration)
+        {
+            timer += Time.deltaTime;
+
+            float progress = duration > 0f
+                ? Mathf.Clamp01(timer / duration)
+                : 1f;
+
+            audioSource.volume = Mathf.Lerp(
+                mainStartVolume, 0f, progress
+            );
+
+            additionalAudioSource.volume = Mathf.Lerp(
+                additionalStartVolume, 0f, progress
+            );
+
+            yield return null;
+        }
+
+        // 두 음악 완전히 정지
+        audioSource.Stop();
+        additionalAudioSource.Stop();
+
+        audioSource.volume = 0f;
+        additionalAudioSource.volume = 0f;
     }
 
-    public void PlayUpper()
-    {
-        PlayBGM(upper);
-    }
 }
